@@ -1,0 +1,8 @@
+main: de.realmeze.main.Main
+author: McMeze
+name: SoulMenu
+version: 0.0.0
+commands:
+  menu:
+  menumgr:
+
