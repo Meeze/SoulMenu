@@ -1,6 +1,7 @@
 package de.realmeze.listener;
 
 import de.realmeze.manager.MenuManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,18 +25,24 @@ public class InventoryCloseListener implements Listener {
 	//if player closes the /menumgr inventory it will be saved to config and model
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event){
-		if(event.getInventory().getTitle().equals(getMenuManager().getInventoryTitle() + " EDIT")){
-			ArrayList<ItemStack> contentToSave = new ArrayList<>();
-			for (ItemStack item : event.getInventory().getContents()) {
-				if(item != null){
-					contentToSave.add(item);
-				}
-				else{
-					contentToSave.add(new ItemStack(Material.AIR));
-				}
+		if(event.getInventory().getTitle().equals( getMenuManager().getInventoryView().getTitle())){
+			if(getMenuManager().getEditor() == null){
+				return;
 			}
-			menuManager.setMenuContent(contentToSave);
-			menuManager.saveInventoryToConfig();
+			if(getMenuManager().getEditor() == event.getPlayer()){
+				ArrayList<ItemStack> contentToSave = new ArrayList<>();
+				for (ItemStack item : event.getInventory().getContents()) {
+					if(item != null){
+						contentToSave.add(item);
+					}
+					else{
+						contentToSave.add(new ItemStack(Material.AIR));
+					}
+				}
+				menuManager.setMenuEditor(null);
+				menuManager.setMenuContent(contentToSave);
+				menuManager.saveInventoryToConfig();
+			}
 		}
 	}
 }

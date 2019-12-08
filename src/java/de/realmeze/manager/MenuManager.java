@@ -6,7 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,6 +25,7 @@ public class MenuManager {
 	public MenuManager(JavaPlugin plugin) {
 		this.plugin = plugin;
 		this.menu = new Menu(loadInventoryFromConfig());
+		getMenu().setShowingInventory(createInventoryView());
 	}
 
 	private Menu getMenu() {
@@ -45,11 +48,24 @@ public class MenuManager {
 		return getMenu().getTitle();
 	}
 
-	public void showToPlayer(Player player, boolean editing) {
-		Inventory inventory = createInventoryView(editing);
-		player.openInventory(inventory);
+	public Inventory getInventoryView(){
+		return getMenu().getShowingInventory();
 	}
 
+	public Player getEditor(){
+		return getMenu().getCurrentEditor();
+	}
+
+	public void setMenuEditor(Player player){
+		getMenu().setCurrentEditor(player);
+	}
+
+	public void showToPlayer(Player player, boolean editing) {
+		if(editing){
+			setMenuEditor(player);
+		}
+		player.openInventory(getInventoryView());
+	}
 
 	public void saveInventoryToConfig() {
 		File file = new File(plugin.getDataFolder(), "menu.yml");
@@ -80,13 +96,8 @@ public class MenuManager {
 		return itemStacks;
 	}
 
-	private Inventory createInventoryView(boolean editing) {
-		Inventory showingInventory;
-		if (editing) {
-			showingInventory = Bukkit.createInventory(null, 54, getInventoryTitle() + " EDIT");
-		} else {
-			showingInventory = Bukkit.createInventory(null, 54, getInventoryTitle());
-		}
+	private Inventory createInventoryView() {
+		Inventory showingInventory = Bukkit.createInventory(null, 54, getInventoryTitle());
 		showingInventory.setContents(getMenuContentAsArray());
 		return showingInventory;
 	}
